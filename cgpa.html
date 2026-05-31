@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGPA Calculator</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            padding: 30px 15px;
+        }
+
+        .container {
+            max-width: 550px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .card h2 {
+            color: #764ba2;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .subject-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .subject-row input {
+            flex: 2;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .subject-row select {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .subject-row input[type="number"] {
+            flex: 1;
+        }
+
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-add {
+            background: #f0e6ff;
+            color: #764ba2;
+            font-weight: bold;
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: bold;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .result-box .gpa-number {
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .result-box .gpa-label {
+            font-size: 14px;
+            opacity: 0.85;
+            margin-bottom: 5px;
+        }
+
+        .semester-list {
+            list-style: none;
+        }
+
+        .semester-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f8f0ff;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #764ba2;
+        }
+
+        .semester-list li span {
+            font-weight: bold;
+            color: #764ba2;
+            font-size: 18px;
+        }
+
+        .cgpa-box {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .cgpa-box .cgpa-number {
+            font-size: 52px;
+            font-weight: bold;
+        }
+
+        .delete-sem {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .labels {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .labels span:nth-child(1) { flex: 2; }
+        .labels span:nth-child(2) { flex: 1; }
+        .labels span:nth-child(3) { flex: 1; }
+        .labels span:nth-child(4) { width: 38px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 CGPA Calculator</h1>
+        <p class="subtitle">VIT Vellore • S=10 A=9 B=8 C=7 D=6 E=5</p>
+
+        <!-- Semester GPA Calculator -->
+        <div class="card">
+            <h2>📚 Current Semester</h2>
+
+            <div class="labels">
+                <span>Subject Name</span>
+                <span>Grade</span>
+                <span>Credits</span>
+                <span></span>
+            </div>
+
+            <div id="subjectList"></div>
+
+            <button class="btn btn-add" onclick="addSubject()">+ Add Subject</button>
+            <button class="btn btn-calculate" onclick="calculateGPA()">Calculate GPA</button>
+
+            <div id="gpaResult" style="display:none;">
+                <div class="result-box">
+                    <div class="gpa-label">Your GPA this semester</div>
+                    <div class="gpa-number" id="gpaNumber">0.00</div>
+                    <div id="gradeRemark"></div>
+                </div>
+                <button class="btn btn-add" style="margin-top:15px;" onclick="saveSemester()">
+                    💾 Save this Semester
+                </button>
+            </div>
+        </div>
+
+        <!-- CGPA Section -->
+        <div class="card">
+            <h2>📊 Overall CGPA</h2>
+            <ul class="semester-list" id="semesterList"></ul>
+            <div id="cgpaResult" style="display:none;">
+                <div class="cgpa-box">
+                    <div class="gpa-label">Your Overall CGPA</div>
+                    <div class="cgpa-number" id="cgpaNumber">0.00</div>
+                </div>
+            </div>
+            <p id="noSemesters" style="color:#aaa; text-align:center;">
+                No semesters saved yet
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const grades = { S:10, A:9, B:8, C:7, D:6, E:5 };
+        let semesters = JSON.parse(localStorage.getItem("semesters")) || [];
+
+        // Add one subject row
+        function addSubject() {
+            let div = document.createElement("div");
+            div.className = "subject-row";
+            div.innerHTML = `
+                <input type="text" placeholder="e.g. Maths">
+                <select>
+                    <option>S</option>
+                    <option>A</option>
+                    <option>B</option>
+                    <option>C</option>
+                    <option>D</option>
+                    <option>E</option>
+                </select>
+                <input type="number" placeholder="Credits" min="1" max="5">
+                <button class="remove-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            document.getElementById("subjectList").appendChild(div);
+        }
+
+        function calculateGPA() {
+            let rows = document.querySelectorAll(".subject-row");
+            if (rows.length === 0) {
+                alert("Please add at least one subject!");
+                return;
+            }
+
+            let totalPoints = 0;
+            let totalCredits = 0;
+
+            rows.forEach(row => {
+                let grade = row.querySelector("select").value;
+                let credits = parseFloat(row.querySelectorAll("input")[1].value);
+
+                if (!credits || credits <= 0) {
+                    alert("Please enter valid credits for all subjects!");
+                    return;
+                }
+
+                totalPoints += grades[grade] * credits;
+                totalCredits += credits;
+            });
+
+            let gpa = (totalPoints / totalCredits).toFixed(2);
+
+            document.getElementById("gpaNumber").textContent = gpa;
+            document.getElementById("gpaResult").style.display = "block";
+
+            // Remark
+            let remark = "";
+            if (gpa >= 9) remark = "🌟 Outstanding!";
+            else if (gpa >= 8) remark = "🎉 Excellent!";
+            else if (gpa >= 7) remark = "👍 Good job!";
+            else if (gpa >= 6) remark = "💪 Keep pushing!";
+            else remark = "📖 Study harder!";
+
+            document.getElementById("gradeRemark").textContent = remark;
+        }
+
+        function saveSemester() {
+            let gpa = document.getElementById("gpaNumber").textContent;
+            let semNum = semesters.length + 1;
+
+            semesters.push({ sem: semNum, gpa: parseFloat(gpa) });
+            localStorage.setItem("semesters", JSON.stringify(semesters));
+
+            // Clear subjects
+            document.getElementById("subjectList").innerHTML = "";
+            document.getElementById("gpaResult").style.display = "none";
+
+            displaySemesters();
+            alert("Semester " + semNum + " saved! 🎉");
+        }
+
+        function deleteSemester(index) {
+            if (confirm("Delete this semester?")) {
+                semesters.splice(index, 1);
+                // Renumber
+                semesters.forEach((s, i) => s.sem = i + 1);
+                localStorage.setItem("semesters", JSON.stringify(semesters));
+                displaySemesters();
+            }
+        }
+
+        function displaySemesters() {
+            let list = document.getElementById("semesterList");
+            list.innerHTML = "";
+
+            if (semesters.length === 0) {
+                document.getElementById("noSemesters").style.display = "block";
+                document.getElementById("cgpaResult").style.display = "none";
+                return;
+            }
+
+            document.getElementById("noSemesters").style.display = "none";
+
+            let totalGPA = 0;
+            semesters.forEach((s, index) => {
+                let li = document.createElement("li");
+                li.innerHTML = `
+                    <div>Semester ${s.sem}</div>
+                    <span>${s.gpa.toFixed(2)}</span>
+                    <button class="delete-sem" onclick="deleteSemester(${index})">Delete</button>
+                `;
+                list.appendChild(li);
+                totalGPA += s.gpa;
+            });
+
+            let cgpa = (totalGPA / semesters.length).toFixed(2);
+            document.getElementById("cgpaNumber").textContent = cgpa;
+            document.getElementById("cgpaResult").style.display = "block";
+        }
+
+        // Load on start
+        addSubject();
+        displaySemesters();
+    </script>
+</body>
+</html>
